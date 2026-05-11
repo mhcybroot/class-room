@@ -17,16 +17,24 @@ function liveHost() {
   return document.getElementById(window.lk.config?.liveStageId ?? '');
 }
 
+function statusHost() {
+  return document.getElementById('lk-status-banner');
+}
+
 function renderStatus(message) {
+  const banner = statusHost();
+  if (banner) {
+    banner.textContent = message;
+  }
+
   const host = liveHost();
   if (!host) return;
   let status = host.querySelector('[data-status]');
   if (!status) {
     status = document.createElement('div');
     status.setAttribute('data-status', 'true');
-    status.style.padding = '0.75rem';
-    status.style.fontSize = '0.95rem';
-    status.style.color = '#24493d';
+    status.className = 'status-copy';
+    status.style.padding = '0.75rem 0.95rem';
     host.prepend(status);
   }
   status.textContent = message;
@@ -40,9 +48,9 @@ function roomGrid() {
     grid = document.createElement('div');
     grid.setAttribute('data-grid', 'true');
     grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(180px, 1fr))';
-    grid.style.gap = '0.5rem';
-    grid.style.padding = '0.5rem';
+    grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(220px, 1fr))';
+    grid.style.gap = '0.9rem';
+    grid.style.padding = '0.9rem';
     host.appendChild(grid);
   }
   return grid;
@@ -54,19 +62,24 @@ function trackKey(participantIdentity, trackSid) {
 
 function trackCard(identity, mediaElement) {
   const card = document.createElement('div');
-  card.style.border = '1px solid #d4e6dd';
-  card.style.borderRadius = '12px';
-  card.style.padding = '0.25rem';
-  card.style.background = '#fff';
+  card.style.border = '1px solid rgba(21, 44, 36, 0.08)';
+  card.style.borderRadius = '18px';
+  card.style.padding = '0.55rem';
+  card.style.background = 'rgba(255, 253, 249, 0.96)';
+  card.style.boxShadow = '0 14px 30px rgba(28, 40, 36, 0.08)';
 
   const label = document.createElement('div');
   label.textContent = identity;
   label.style.fontSize = '12px';
-  label.style.fontWeight = '700';
-  label.style.padding = '0.2rem';
+  label.style.fontWeight = '800';
+  label.style.letterSpacing = '0.08em';
+  label.style.textTransform = 'uppercase';
+  label.style.padding = '0.35rem 0.25rem 0.55rem';
+  label.style.color = '#20332d';
 
   mediaElement.style.width = '100%';
-  mediaElement.style.borderRadius = '10px';
+  mediaElement.style.borderRadius = '14px';
+  mediaElement.style.background = '#10261f';
 
   card.appendChild(label);
   card.appendChild(mediaElement);
@@ -126,7 +139,7 @@ async function ensurePreviewTracks() {
         window.lk.previewSummary = 'Camera ready. Microphone unavailable.';
         return window.lk.previewTracks;
       } catch (videoError) {
-        // Fall through and try audio only.
+        // Try audio only next.
       }
     }
 
@@ -136,7 +149,7 @@ async function ensurePreviewTracks() {
         window.lk.previewSummary = 'Microphone ready. Camera unavailable.';
         return window.lk.previewTracks;
       } catch (audioError) {
-        // Fall through to no local media state.
+        // Fall through to no local media.
       }
     }
 
@@ -152,29 +165,65 @@ function renderPreview() {
   if (!host) return;
   host.innerHTML = '';
 
+  const frame = document.createElement('div');
+  frame.style.width = '100%';
+  frame.style.minHeight = '280px';
+  frame.style.display = 'flex';
+  frame.style.alignItems = 'center';
+  frame.style.justifyContent = 'center';
+  frame.style.position = 'relative';
+  frame.style.padding = '0.9rem';
+  frame.style.boxSizing = 'border-box';
+
+  const hint = document.createElement('div');
+  hint.textContent = window.lk.previewSummary;
+  hint.style.position = 'absolute';
+  hint.style.left = '1rem';
+  hint.style.bottom = '1rem';
+  hint.style.padding = '0.65rem 0.85rem';
+  hint.style.borderRadius = '999px';
+  hint.style.background = 'rgba(255, 253, 249, 0.92)';
+  hint.style.color = '#20332d';
+  hint.style.fontWeight = '700';
+  hint.style.fontSize = '0.9rem';
+
   if (window.lk.previewTracks.length === 0) {
     const empty = document.createElement('div');
-    empty.style.padding = '1rem';
-    empty.style.fontSize = '0.95rem';
+    empty.style.padding = '1.2rem';
+    empty.style.textAlign = 'center';
+    empty.style.maxWidth = '26rem';
+    empty.style.color = '#5f716b';
     empty.textContent = window.lk.previewSummary;
-    host.appendChild(empty);
+    frame.appendChild(empty);
+    host.appendChild(frame);
     return;
   }
 
-  window.lk.previewTracks.forEach((track) => {
-    if (track.kind === 'video') {
-      const element = track.attach();
-      element.style.width = '100%';
-      element.style.height = '100%';
-      element.style.objectFit = 'cover';
-      host.appendChild(element);
-    }
-  });
-  const hint = document.createElement('div');
-  hint.style.padding = '0.5rem';
-  hint.style.fontSize = '0.9rem';
-  hint.textContent = window.lk.previewSummary;
-  host.appendChild(hint);
+  const videoTrack = window.lk.previewTracks.find((track) => track.kind === 'video');
+  if (videoTrack) {
+    const element = videoTrack.attach();
+    element.style.width = '100%';
+    element.style.height = '100%';
+    element.style.maxHeight = '320px';
+    element.style.objectFit = 'cover';
+    element.style.borderRadius = '18px';
+    frame.appendChild(element);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.style.width = '100%';
+    placeholder.style.minHeight = '220px';
+    placeholder.style.display = 'flex';
+    placeholder.style.alignItems = 'center';
+    placeholder.style.justifyContent = 'center';
+    placeholder.style.textAlign = 'center';
+    placeholder.style.padding = '1.2rem';
+    placeholder.style.color = '#5f716b';
+    placeholder.textContent = 'Camera preview is unavailable, but your microphone can still join the class.';
+    frame.appendChild(placeholder);
+  }
+
+  frame.appendChild(hint);
+  host.appendChild(frame);
 }
 
 async function publishPreviewTracks(room) {

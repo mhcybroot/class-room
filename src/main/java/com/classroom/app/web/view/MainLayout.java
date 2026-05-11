@@ -1,10 +1,12 @@
 package com.classroom.app.web.view;
 
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Nav;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
@@ -19,31 +21,60 @@ import java.util.Map;
 @AnonymousAllowed
 public class MainLayout extends AppLayout implements AfterNavigationObserver {
     private final Map<String, Anchor> navLinks = new LinkedHashMap<>();
+    private final Nav nav = new Nav();
+    private final Button mobileMenuButton = new Button("⋯");
 
     public MainLayout() {
-        H2 brand = new H2("ClassRoom Live");
-        brand.addClassName("site-brand");
+        Div brandWrap = new Div();
+        brandWrap.addClassName("site-brand-wrap");
 
-        Nav nav = new Nav();
+        Span brandTitle = new Span("ClassRoom Live");
+        brandTitle.addClassName("site-brand-title");
+        Span brandSubtitle = new Span("Virtual Classroom Platform");
+        brandSubtitle.addClassName("site-brand-subtitle");
+        brandWrap.add(brandTitle, brandSubtitle);
+
         nav.addClassName("site-nav");
+        mobileMenuButton.addClassName("mobile-menu-button");
+        mobileMenuButton.getElement().setAttribute("aria-label", "Open navigation menu");
+        mobileMenuButton.getElement().setAttribute("title", "Open navigation menu");
+        mobileMenuButton.addClickListener(event -> {
+            var classList = nav.getElement().getClassList();
+            if (classList.contains("nav-open")) {
+                classList.remove("nav-open");
+            } else {
+                classList.add("nav-open");
+            }
+        });
 
-        addPublicLinks();
         if (isTeacherAuthenticated()) {
-            navLinks.remove("/login");
-            navLinks.put("/teacher", navAnchor("/teacher", "Teacher Dashboard"));
-            navLinks.put("/logout", navAnchor("/logout", "Logout"));
+            addTeacherLinks();
+        } else {
+            addPublicLinks();
         }
         navLinks.values().forEach(nav::add);
 
         Header topHeader = new Header();
         topHeader.addClassName("site-header");
-        HorizontalLayout header = new HorizontalLayout(brand, nav);
+
+        HorizontalLayout header = new HorizontalLayout(brandWrap, nav, mobileMenuButton);
         header.addClassName("site-header-inner");
         header.setWidthFull();
         header.setJustifyContentMode(HorizontalLayout.JustifyContentMode.BETWEEN);
         topHeader.add(header);
 
-        addToNavbar(topHeader);
+        Div trustBar = new Div();
+        trustBar.addClassName("site-trust-bar");
+        Div trustInner = new Div();
+        trustInner.addClassName("site-trust-inner");
+        Span trustCopy = new Span(isTeacherAuthenticated()
+                ? "Teacher workspace"
+                : "Join classes with room code or teacher invite");
+        trustCopy.addClassName("site-trust-copy");
+        trustInner.add(trustCopy, trustPill(isTeacherAuthenticated() ? "Teacher mode" : "Student access"));
+        trustBar.add(trustInner);
+
+        addToNavbar(topHeader, trustBar);
     }
 
     @Override
@@ -53,25 +84,41 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
             currentPath = "/";
         }
         for (Map.Entry<String, Anchor> entry : navLinks.entrySet()) {
-            if (entry.getKey().equals(currentPath)) {
+            if (currentPath.equals(entry.getKey()) || ("/teacher".equals(entry.getKey()) && currentPath.startsWith("/teacher"))) {
                 entry.getValue().addClassName("active-link");
             } else {
                 entry.getValue().removeClassName("active-link");
             }
         }
+        nav.getElement().getClassList().remove("nav-open");
     }
 
     private void addPublicLinks() {
-        navLinks.put("/", navAnchor("/", "Home"));
-        navLinks.put("/about", navAnchor("/about", "About"));
-        navLinks.put("/contact", navAnchor("/contact", "Contact"));
-        navLinks.put("/login", navAnchor("/login", "Teacher Login"));
+        navLinks.put("/", navAnchor("/", "Home", false));
+        navLinks.put("/login", navAnchor("/login", "Teacher Login", true));
     }
 
-    private Anchor navAnchor(String href, String label) {
+    private void addTeacherLinks() {
+        navLinks.put("/teacher", navAnchor("/teacher", "Dashboard", false));
+        navLinks.put("/teacher/classes", navAnchor("/teacher/classes", "Classes", false));
+        navLinks.put("/teacher/rooms", navAnchor("/teacher/rooms", "Rooms", false));
+        navLinks.put("/teacher/live", navAnchor("/teacher/live", "Live", false));
+        navLinks.put("/logout", navAnchor("/logout", "Logout", true));
+    }
+
+    private Anchor navAnchor(String href, String label, boolean authAction) {
         Anchor anchor = new Anchor(href, label);
         anchor.addClassName("nav-link");
+        if (authAction) {
+            anchor.addClassName("auth-link");
+        }
         return anchor;
+    }
+
+    private Span trustPill(String text) {
+        Span pill = new Span(text);
+        pill.addClassName("site-trust-pill");
+        return pill;
     }
 
     private boolean isTeacherAuthenticated() {

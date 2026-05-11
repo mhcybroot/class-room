@@ -28,6 +28,7 @@ public class SecurityConfig extends VaadinWebSecurity {
                 .requestMatchers("/api/livekit/token", "/api/livekit/leave", "/", "/about", "/contact", "/join/**", "/live/**", "/js/**").permitAll()
                 .requestMatchers("/api/rooms/**").hasRole("TEACHER")
         );
+        http.formLogin(form -> form.defaultSuccessUrl("/teacher", true));
         super.configure(http);
         setLoginView(http, LoginView.class);
     }
