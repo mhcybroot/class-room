@@ -112,6 +112,12 @@ async function ensurePreviewTracks() {
     return window.lk.previewTracks;
   }
 
+  if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    window.lk.previewTracks = [];
+    window.lk.previewSummary = 'Camera/microphone require HTTPS (or localhost). Open this page over https:// to use local media.';
+    return window.lk.previewTracks;
+  }
+
   const devices = await navigator.mediaDevices.enumerateDevices();
   const hasAudioInput = devices.some((device) => device.kind === 'audioinput');
   const hasVideoInput = devices.some((device) => device.kind === 'videoinput');

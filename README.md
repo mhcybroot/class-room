@@ -47,3 +47,26 @@ mvn test
 
 ## Security note
 Rotate exposed LiveKit credentials before production use.
+
+## HTTPS for Camera/Microphone in Production
+Browsers block `navigator.mediaDevices` on insecure origins.  
+If you open this app as `http://<public-ip>:8091`, camera/microphone will not work.
+
+Use HTTPS in production:
+
+1. Create/load a PKCS12 keystore (`.p12`) with your TLS certificate.
+2. Run with the `prod` profile and SSL env vars:
+
+```bash
+export SPRING_PROFILES_ACTIVE=prod
+export SSL_KEY_STORE=/path/to/keystore.p12
+export SSL_KEY_STORE_PASSWORD=changeit
+export SSL_KEY_ALIAS=tomcat
+mvn spring-boot:run
+```
+
+Then open: `https://your-domain-or-ip:8091`
+
+Notes:
+- `localhost` works for local testing without HTTPS, but public IP/domain requires HTTPS.
+- For LiveKit media transport in production, set `livekit.url` to your secure endpoint (`wss://...`) where appropriate.
