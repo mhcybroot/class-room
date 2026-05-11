@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route(value = "contact", layout = MainLayout.class)
-@PageTitle("Contact Us")
+@PageTitle("Contact Us - ClassRoom Live")
 @AnonymousAllowed
 public class ContactView extends VerticalLayout {
     public ContactView(AppContentProperties props) {

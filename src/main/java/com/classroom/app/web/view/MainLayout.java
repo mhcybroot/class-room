@@ -25,6 +25,12 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     private final Button mobileMenuButton = new Button("⋯");
 
     public MainLayout() {
+        // Skip navigation link for accessibility (keyboard users can skip to main content)
+        Anchor skipLink = new Anchor("#main-content", "Skip to main content");
+        skipLink.getElement().setAttribute("aria-label", "Skip to main content");
+        skipLink.addClassName("skip-link");
+        addToNavbar(skipLink);
+
         Div brandWrap = new Div();
         brandWrap.addClassName("site-brand-wrap");
 

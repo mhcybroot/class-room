@@ -9,6 +9,7 @@ import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LiveKitService {
@@ -51,10 +52,10 @@ public class LiveKitService {
         try {
             Response<LivekitModels.Room> response = roomClient.createRoom(roomName).execute();
             if (!response.isSuccessful() && response.code() != 409) {
-                throw new LiveKitOperationException("Could not create LiveKit room");
+                throw new LiveKitOperationException("Could not create LiveKit room: " + describeResponse(response));
             }
         } catch (IOException ex) {
-            throw new LiveKitOperationException("LiveKit room creation failed");
+            throw new LiveKitOperationException("LiveKit room creation failed: " + ex.getMessage());
         }
     }
 
@@ -127,5 +128,20 @@ public class LiveKitService {
         if (liveKitUrl.startsWith("ws://")) return "http://" + liveKitUrl.substring(5);
         if (liveKitUrl.startsWith("wss://")) return "https://" + liveKitUrl.substring(6);
         return liveKitUrl;
+    }
+
+    private static String describeResponse(Response<?> response) {
+        StringBuilder details = new StringBuilder("status=" + response.code());
+        try {
+            if (response.errorBody() != null) {
+                String body = response.errorBody().string();
+                if (!body.isBlank()) {
+                    details.append(", body=").append(body);
+                }
+            }
+        } catch (IOException ignored) {
+            // Keep status-only details if error body cannot be read.
+        }
+        return details.toString();
     }
 }

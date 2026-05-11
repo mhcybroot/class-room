@@ -27,7 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
 @Route(value = "teacher/rooms", layout = MainLayout.class)
-@PageTitle("Rooms")
+@PageTitle("Manage Rooms - ClassRoom Live")
 @RolesAllowed("TEACHER")
 public class RoomsView extends VerticalLayout {
     public RoomsView(TeacherRepository teacherRepository, ClassroomService classroomService, RoomService roomService) {

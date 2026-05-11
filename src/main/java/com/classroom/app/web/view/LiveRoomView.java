@@ -30,7 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 @JsModule("livekit-client.js")
 @Route(value = "live/:role/:roomId", layout = MainLayout.class)
-@PageTitle("Live Class")
+@PageTitle("Live Class - ClassRoom Live")
 @AnonymousAllowed
 public class LiveRoomView extends VerticalLayout implements BeforeEnterObserver {
     private final VirtualRoomRepository roomRepository;

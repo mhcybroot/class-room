@@ -27,7 +27,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.util.Map;
 
 @Route(value = "join/:code", layout = MainLayout.class)
-@PageTitle("Join Class")
+@PageTitle("Join Class - ClassRoom Live")
 @AnonymousAllowed
 public class StudentJoinView extends VerticalLayout implements BeforeEnterObserver {
     private final RoomService roomService;

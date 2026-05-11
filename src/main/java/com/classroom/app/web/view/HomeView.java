@@ -19,7 +19,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.util.List;
 
 @Route(value = "", layout = MainLayout.class)
-@PageTitle("Home")
+@PageTitle("ClassRoom Live - Virtual Classroom")
 @AnonymousAllowed
 public class HomeView extends VerticalLayout {
     public HomeView(VirtualRoomRepository roomRepository) {

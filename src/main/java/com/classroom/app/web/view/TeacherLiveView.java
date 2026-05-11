@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Route(value = "teacher/live", layout = MainLayout.class)
-@PageTitle("Live")
+@PageTitle("Live Sessions - ClassRoom Live")
 @RolesAllowed("TEACHER")
 public class TeacherLiveView extends VerticalLayout {
     public TeacherLiveView(TeacherRepository teacherRepository, RoomService roomService) {
