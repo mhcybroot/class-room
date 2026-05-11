@@ -1,0 +1,257 @@
+:host {
+  --lumo-primary-color: #0b6e4f;
+  --lumo-primary-text-color: #0b6e4f;
+  --lumo-base-color: #f4f8f6;
+  --app-bg: linear-gradient(180deg, #f4f8f6 0%, #eaf5f0 100%);
+  --app-surface: #ffffff;
+  --app-text: #123027;
+  --app-muted: #45665c;
+  --app-border: #d4e6dd;
+  --app-shadow: 0 10px 26px rgba(20, 45, 35, 0.08);
+  --app-radius: 16px;
+  --app-space-1: 0.5rem;
+  --app-space-2: 0.75rem;
+  --app-space-3: 1rem;
+  --app-space-4: 1.5rem;
+  --app-space-5: 2rem;
+}
+
+html,
+body {
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.mobile-container {
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: var(--app-space-2);
+  box-sizing: border-box;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--app-border);
+  background: #ffffffc2;
+  backdrop-filter: blur(8px);
+}
+
+.site-header-inner {
+  margin: 0 auto;
+  width: min(100%, 1120px);
+  padding: 0.65rem var(--app-space-3);
+  align-items: center;
+}
+
+.site-brand {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+}
+
+.site-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #1f4a3b;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.nav-link:hover {
+  background: #ecf7f2;
+}
+
+.active-link {
+  background: #0b6e4f;
+  color: #fff;
+  border-color: #0b6e4f;
+}
+
+.surface-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+  padding: var(--app-space-4);
+  margin-bottom: var(--app-space-3);
+}
+
+.hero-block h1 {
+  margin: 0;
+  font-size: 1.85rem;
+}
+
+.page-title {
+  margin: 0 0 var(--app-space-1) 0;
+}
+
+.hero-block p,
+.meta-line {
+  color: var(--app-muted);
+}
+
+.room-grid {
+  display: grid;
+  gap: var(--app-space-3);
+  grid-template-columns: 1fr;
+  margin-top: var(--app-space-3);
+}
+
+.room-card .room-title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.room-card h3 {
+  margin: 0;
+}
+
+.room-card-head {
+  align-items: center;
+}
+
+.status-badge {
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-live {
+  background: #d9f7e7;
+  color: #07653f;
+}
+
+.badge-scheduled {
+  background: #fff4d8;
+  color: #7a5b00;
+}
+
+.badge-closed {
+  background: #ffe2e2;
+  color: #8a2a2a;
+}
+
+.primary-btn {
+  background: #0b6e4f;
+  color: #fff;
+}
+
+.empty-state {
+  text-align: center;
+}
+
+.login-page {
+  max-width: 640px;
+}
+
+.join-page,
+.info-page,
+.live-room-page,
+.teacher-dashboard-page {
+  max-width: 1080px;
+}
+
+.login-hero h1,
+.login-card h3 {
+  margin: 0 0 var(--app-space-1) 0;
+}
+
+.helper-text {
+  margin-top: var(--app-space-2);
+  padding: var(--app-space-2);
+  border-left: 4px solid #0b6e4f;
+  background: #eff9f4;
+  color: #204d3f;
+  border-radius: 8px;
+}
+
+.login-footer a {
+  margin-bottom: 0.25rem;
+  color: #0b6e4f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.preview-stage,
+.live-stage {
+  width: 100%;
+  min-height: 240px;
+  border-radius: 14px;
+  border: 1px dashed var(--app-border);
+  background: linear-gradient(180deg, #f8fcfa 0%, #edf6f1 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+.preview-stage {
+  margin: var(--app-space-2) 0;
+}
+
+.live-stage {
+  min-height: 360px;
+  margin-top: var(--app-space-2);
+}
+
+.live-control-bar {
+  gap: 0.5rem;
+  margin-bottom: var(--app-space-2);
+}
+
+.prejoin-card {
+  margin-top: var(--app-space-2);
+}
+
+vaadin-button {
+  min-height: 44px;
+}
+
+vaadin-text-field {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .site-header-inner {
+    padding: 0.6rem 0.75rem;
+    align-items: flex-start;
+  }
+
+  .site-brand {
+    font-size: 1.05rem;
+  }
+
+  .surface-card {
+    padding: 0.95rem;
+  }
+
+  .live-stage {
+    min-height: 280px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-container {
+    padding: var(--app-space-4);
+  }
+
+  .room-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .room-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
