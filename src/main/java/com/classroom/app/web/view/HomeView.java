@@ -36,7 +36,7 @@ public class HomeView extends VerticalLayout {
 
     private VerticalLayout buildHero() {
         VerticalLayout hero = new VerticalLayout();
-        hero.addClassName("hero-panel");
+        hero.addClassName("card");
         hero.setPadding(false);
         hero.setSpacing(false);
         hero.add(
@@ -52,7 +52,7 @@ public class HomeView extends VerticalLayout {
 
         if (rooms.isEmpty()) {
             VerticalLayout empty = new VerticalLayout();
-            empty.addClassName("surface-card");
+            empty.addClassName("card");
             empty.addClassName("empty-state");
             empty.setPadding(false);
             empty.setSpacing(false);
@@ -66,7 +66,7 @@ public class HomeView extends VerticalLayout {
         roomGrid.setWidthFull();
         for (VirtualRoom room : rooms) {
             VerticalLayout card = new VerticalLayout();
-            card.addClassName("surface-card");
+            card.addClassName("card");
             card.addClassName("room-card");
             card.setPadding(false);
             card.setSpacing(false);
@@ -125,7 +125,7 @@ public class HomeView extends VerticalLayout {
 
     private VerticalLayout section(String kicker, String title, String copy) {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.setWidthFull();
@@ -183,7 +183,7 @@ public class HomeView extends VerticalLayout {
     private static final class SpanBadge extends Div {
         private SpanBadge(String label, String className) {
             setText(label);
-            addClassName("status-badge");
+            addClassName("badge");
             addClassName(className);
         }
     }

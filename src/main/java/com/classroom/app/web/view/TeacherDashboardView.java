@@ -13,6 +13,8 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -23,23 +25,41 @@ import java.util.List;
 @Route(value = "teacher", layout = MainLayout.class)
 @PageTitle("Teacher Dashboard - ClassRoom Live")
 @RolesAllowed("TEACHER")
-public class TeacherDashboardView extends VerticalLayout {
+public class TeacherDashboardView extends VerticalLayout implements BeforeEnterObserver {
+    private Teacher teacher;
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+                event.rerouteTo(LoginView.class);
+                return;
+        }
+        // Store auth name for constructor — still need to fetch in constructor for the service calls
+        // but we guard against null auth here
+    }
+
     public TeacherDashboardView(TeacherRepository teacherRepository, ClassroomService classroomService, RoomService roomService) {
         addClassName("mobile-container");
         addClassName("teacher-dashboard-page");
         addClassName("page-stack");
 
-        Teacher teacher = teacherRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        List<Classroom> classrooms = classroomService.byTeacher(teacher);
-        List<VirtualRoom> rooms = roomService.roomsByTeacher(teacher);
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        this.teacher = teacherRepository.findByEmail(auth.getName()).orElse(null);
+        if (this.teacher == null) {
+            getUI().ifPresent(ui -> ui.navigate(LoginView.class));
+            return;
+        }
+        List<Classroom> classrooms = classroomService.byTeacher(this.teacher);
+        List<VirtualRoom> rooms = roomService.roomsByTeacher(this.teacher);
 
-        add(buildOverviewBanner(teacher, classrooms.size(), rooms.size()));
+        add(buildOverviewBanner(this.teacher, classrooms.size(), rooms.size()));
         add(buildActionSection());
     }
 
     private VerticalLayout buildOverviewBanner(Teacher teacher, int classCount, int roomCount) {
         VerticalLayout banner = new VerticalLayout();
-        banner.addClassName("hero-panel");
+        banner.addClassName("card");
         banner.setPadding(false);
         banner.setSpacing(false);
         banner.add(
@@ -53,7 +73,7 @@ public class TeacherDashboardView extends VerticalLayout {
 
     private VerticalLayout buildActionSection() {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker("Workspace"), sectionTitle("Choose a teacher task"), copy("Open a dedicated page for the work you want to do."));

@@ -19,6 +19,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -29,19 +31,35 @@ import java.util.List;
 @Route(value = "teacher/rooms", layout = MainLayout.class)
 @PageTitle("Manage Rooms - ClassRoom Live")
 @RolesAllowed("TEACHER")
-public class RoomsView extends VerticalLayout {
+public class RoomsView extends VerticalLayout implements BeforeEnterObserver {
+    private Teacher teacher;
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+                event.rerouteTo(LoginView.class);
+                return;
+        }
+    }
+
     public RoomsView(TeacherRepository teacherRepository, ClassroomService classroomService, RoomService roomService) {
         addClassName("mobile-container");
         addClassName("page-stack");
 
-        Teacher teacher = teacherRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        add(buildCreateRoomSection(teacher, classroomService, roomService));
-        add(buildRoomsSection(teacher, roomService));
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        this.teacher = teacherRepository.findByEmail(auth.getName()).orElse(null);
+        if (this.teacher == null) {
+            getUI().ifPresent(ui -> ui.navigate(LoginView.class));
+            return;
+        }
+        add(buildCreateRoomSection(this.teacher, classroomService, roomService));
+        add(buildRoomsSection(this.teacher, roomService));
     }
 
     private VerticalLayout buildCreateRoomSection(Teacher teacher, ClassroomService classroomService, RoomService roomService) {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker("Create room"), title("Create room from class"), copy("Choose a class and create a virtual room for it."));
@@ -49,7 +67,7 @@ public class RoomsView extends VerticalLayout {
         List<Classroom> classrooms = classroomService.byTeacher(teacher);
         if (classrooms.isEmpty()) {
             VerticalLayout empty = new VerticalLayout();
-            empty.addClassName("surface-card");
+            empty.addClassName("card");
             empty.setPadding(false);
             empty.setSpacing(false);
             empty.add(new H3("No classes available"), copy("Create a class first before creating rooms."));
@@ -61,7 +79,7 @@ public class RoomsView extends VerticalLayout {
         grid.addClassName("room-grid");
         for (Classroom classroom : classrooms) {
             VerticalLayout card = new VerticalLayout();
-            card.addClassName("surface-card");
+            card.addClassName("card");
             card.addClassName("room-card");
             card.setPadding(false);
             card.setSpacing(false);
@@ -85,7 +103,7 @@ public class RoomsView extends VerticalLayout {
 
     private VerticalLayout buildRoomsSection(Teacher teacher, RoomService roomService) {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker("Rooms"), title("Manage rooms"), copy("Open, close, and share invite details from here."));
@@ -93,7 +111,7 @@ public class RoomsView extends VerticalLayout {
         List<VirtualRoom> rooms = roomService.roomsByTeacher(teacher);
         if (rooms.isEmpty()) {
             VerticalLayout empty = new VerticalLayout();
-            empty.addClassName("surface-card");
+            empty.addClassName("card");
             empty.setPadding(false);
             empty.setSpacing(false);
             empty.add(new H3("No rooms yet"), copy("Create a room from one of your classes."));
@@ -105,7 +123,7 @@ public class RoomsView extends VerticalLayout {
         grid.addClassName("room-grid");
         for (VirtualRoom room : rooms) {
             VerticalLayout card = new VerticalLayout();
-            card.addClassName("surface-card");
+            card.addClassName("card");
             card.addClassName("room-card");
             card.setPadding(false);
             card.setSpacing(false);
@@ -157,7 +175,7 @@ public class RoomsView extends VerticalLayout {
         VerticalLayout content = new VerticalLayout(copy("Share these details with students when the room is ready."), joinLink, roomPin, new HorizontalLayout(copyLink, copyPin, done));
         content.setPadding(false);
         content.setSpacing(false);
-        content.addClassName("surface-card");
+        content.addClassName("card");
         dialog.add(content);
         return dialog;
     }
@@ -187,7 +205,7 @@ public class RoomsView extends VerticalLayout {
 
     private Span statusBadge(String text) {
         Span badge = new Span(text);
-        badge.addClassName("status-badge");
+        badge.addClassName("badge");
         if ("LIVE".equalsIgnoreCase(text)) {
             badge.addClassName("badge-live");
         } else if ("SCHEDULED".equalsIgnoreCase(text)) {

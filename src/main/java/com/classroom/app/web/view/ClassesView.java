@@ -15,6 +15,8 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -25,14 +27,30 @@ import java.util.List;
 @Route(value = "teacher/classes", layout = MainLayout.class)
 @PageTitle("Manage Classes - ClassRoom Live")
 @RolesAllowed("TEACHER")
-public class ClassesView extends VerticalLayout {
+public class ClassesView extends VerticalLayout implements BeforeEnterObserver {
+    private Teacher teacher;
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+                event.rerouteTo(LoginView.class);
+                return;
+        }
+    }
+
     public ClassesView(TeacherRepository teacherRepository, ClassroomService classroomService) {
         addClassName("mobile-container");
         addClassName("page-stack");
 
-        Teacher teacher = teacherRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        add(buildCreateCard(teacher, classroomService));
-        add(buildClassesList(teacher, classroomService));
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        this.teacher = teacherRepository.findByEmail(auth.getName()).orElse(null);
+        if (this.teacher == null) {
+            getUI().ifPresent(ui -> ui.navigate(LoginView.class));
+            return;
+        }
+        add(buildCreateCard(this.teacher, classroomService));
+        add(buildClassesList(this.teacher, classroomService));
     }
 
     private VerticalLayout buildCreateCard(Teacher teacher, ClassroomService classroomService) {
@@ -53,7 +71,7 @@ public class ClassesView extends VerticalLayout {
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
 
         VerticalLayout card = new VerticalLayout();
-        card.addClassName("section-band");
+        card.addClassName("card");
         card.setPadding(false);
         card.setSpacing(false);
         card.add(kicker("Classes"), title("Create class"), copy("Add a class before creating a room."), form);
@@ -62,7 +80,7 @@ public class ClassesView extends VerticalLayout {
 
     private VerticalLayout buildClassesList(Teacher teacher, ClassroomService classroomService) {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker("Class list"), title("Your classes"), copy("View and delete classes from here."));
@@ -70,7 +88,7 @@ public class ClassesView extends VerticalLayout {
         List<Classroom> classrooms = classroomService.byTeacher(teacher);
         if (classrooms.isEmpty()) {
             VerticalLayout empty = new VerticalLayout();
-            empty.addClassName("surface-card");
+            empty.addClassName("card");
             empty.setPadding(false);
             empty.setSpacing(false);
             empty.add(new H3("No classes yet"), copy("Create your first class using the form above."));
@@ -82,7 +100,7 @@ public class ClassesView extends VerticalLayout {
         grid.addClassName("room-grid");
         for (Classroom classroom : classrooms) {
             VerticalLayout card = new VerticalLayout();
-            card.addClassName("surface-card");
+            card.addClassName("card");
             card.addClassName("room-card");
             card.setPadding(false);
             card.setSpacing(false);

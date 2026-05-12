@@ -12,6 +12,8 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
@@ -24,19 +26,35 @@ import java.util.Map;
 @Route(value = "teacher/live", layout = MainLayout.class)
 @PageTitle("Live Sessions - ClassRoom Live")
 @RolesAllowed("TEACHER")
-public class TeacherLiveView extends VerticalLayout {
+public class TeacherLiveView extends VerticalLayout implements BeforeEnterObserver {
+    private Teacher teacher;
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+                event.rerouteTo(LoginView.class);
+                return;
+        }
+    }
+
     public TeacherLiveView(TeacherRepository teacherRepository, RoomService roomService) {
         addClassName("mobile-container");
         addClassName("page-stack");
 
-        Teacher teacher = teacherRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        this.teacher = teacherRepository.findByEmail(auth.getName()).orElse(null);
+        if (this.teacher == null) {
+            getUI().ifPresent(ui -> ui.navigate(LoginView.class));
+            return;
+        }
         add(buildHeader());
-        add(buildLiveRoomsSection(roomService.roomsByTeacher(teacher)));
+        add(buildLiveRoomsSection(roomService.roomsByTeacher(this.teacher)));
     }
 
     private VerticalLayout buildHeader() {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("hero-panel");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker("Live"), title("Go live"), copy("Enter a live room from here after it has been opened on the Rooms page."));
@@ -45,14 +63,14 @@ public class TeacherLiveView extends VerticalLayout {
 
     private VerticalLayout buildLiveRoomsSection(List<VirtualRoom> rooms) {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker("Live rooms"), sectionTitle("Teacher live access"), copy("Open rooms from the Rooms page, then enter the live classroom from here."));
 
         if (rooms.isEmpty()) {
             VerticalLayout empty = new VerticalLayout();
-            empty.addClassName("surface-card");
+            empty.addClassName("card");
             empty.setPadding(false);
             empty.setSpacing(false);
             empty.add(new H3("No rooms available"), copy("Create a room first from the Rooms page."));
@@ -64,7 +82,7 @@ public class TeacherLiveView extends VerticalLayout {
         grid.addClassName("room-grid");
         for (VirtualRoom room : rooms) {
             VerticalLayout card = new VerticalLayout();
-            card.addClassName("surface-card");
+            card.addClassName("card");
             card.addClassName("room-card");
             card.setPadding(false);
             card.setSpacing(false);
@@ -102,7 +120,7 @@ public class TeacherLiveView extends VerticalLayout {
 
     private Span statusBadge(String text) {
         Span badge = new Span(text);
-        badge.addClassName("status-badge");
+        badge.addClassName("badge");
         if ("LIVE".equalsIgnoreCase(text)) {
             badge.addClassName("badge-live");
         } else if ("SCHEDULED".equalsIgnoreCase(text)) {

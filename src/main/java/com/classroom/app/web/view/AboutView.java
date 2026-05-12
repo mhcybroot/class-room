@@ -21,7 +21,7 @@ public class AboutView extends VerticalLayout {
         addClassName("page-stack");
 
         VerticalLayout hero = new VerticalLayout();
-        hero.addClassName("hero-panel");
+        hero.addClassName("card");
         hero.setPadding(false);
         hero.setSpacing(false);
         hero.add(kicker("About the platform"), title(props.aboutTitle()), copy(props.aboutBody()));
@@ -62,7 +62,7 @@ public class AboutView extends VerticalLayout {
 
     private VerticalLayout section(String kicker, String title, String copy, Div content) {
         VerticalLayout section = new VerticalLayout();
-        section.addClassName("section-band");
+        section.addClassName("card");
         section.setPadding(false);
         section.setSpacing(false);
         section.add(kicker(kicker), sectionTitle(title), copy(copy), content);

@@ -15,3 +15,48 @@ declare module 'csstype' {
     [index: `--${string}`]: any;
   }
 }
+
+// Make this file a module (enables declare global)
+export {};
+
+// ============================================================
+// LiveKit window function declarations
+// These functions are defined in livekit-client.js and called
+// from LiveRoomView.java via executeJs()
+// ============================================================
+
+interface LkConfig {
+  roomId: string;
+  role: string;
+  displayName: string;
+  previewStageId: string;
+  liveStageId: string;
+}
+
+interface LkTrackNodes {
+  get(key: string): HTMLElement | undefined;
+  set(key: string, value: HTMLElement): void;
+  delete(key: string): void;
+  clear(): void;
+}
+
+interface LkState {
+  room: import('livekit-client').Room | null;
+  config: LkConfig | null;
+  previewTracks: import('livekit-client').LocalTrack[];
+  trackNodes: LkTrackNodes;
+  joined: boolean;
+  previewSummary: string;
+}
+
+declare global {
+  interface Window {
+    lk: LkState;
+    initLiveRoom(roomId: string, role: string, displayName: string, previewStageId: string, liveStageId: string): void;
+    startPreview(): Promise<void>;
+    joinLiveRoom(): Promise<void>;
+    startScreenShare(): Promise<void>;
+    muteAllByTeacher(roomId: string): Promise<{ mutedTracks?: number; message?: string }>;
+    leaveLiveRoom(clearStudentSession: boolean): Promise<void>;
+  }
+}

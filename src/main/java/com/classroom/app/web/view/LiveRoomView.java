@@ -72,7 +72,7 @@ public class LiveRoomView extends VerticalLayout implements BeforeEnterObserver 
         statusBanner.setId("lk-status-banner");
         statusBanner.setText("Start your preview to begin.");
 
-        preJoinCard.addClassName("surface-card");
+        preJoinCard.addClassName("card");
         preJoinCard.addClassName("prejoin-card");
         preJoinCard.addClassName("live-card");
         preJoinCard.setPadding(false);
@@ -85,7 +85,7 @@ public class LiveRoomView extends VerticalLayout implements BeforeEnterObserver 
         sidePanel.setPadding(false);
         sidePanel.setSpacing(false);
 
-        stageShell.addClassName("surface-card");
+        stageShell.addClassName("card");
         stageShell.addClassName("live-card-shell");
         stageShell.setPadding(false);
         stageShell.setSpacing(false);
@@ -108,7 +108,22 @@ public class LiveRoomView extends VerticalLayout implements BeforeEnterObserver 
         statusBanner.setText("Start your preview to begin.");
 
         String roleParam = event.getRouteParameters().get("role").orElse("student");
-        Long roomId = Long.valueOf(event.getRouteParameters().get("roomId").orElse("0"));
+        String roomIdParam = event.getRouteParameters().get("roomId").orElse(null);
+
+        if (roomIdParam == null || roomIdParam.isBlank()) {
+            Notification.show("Invalid room link");
+            event.forwardTo(HomeView.class);
+            return;
+        }
+
+        long roomId;
+        try {
+            roomId = Long.parseLong(roomIdParam);
+        } catch (NumberFormatException e) {
+            Notification.show("Invalid room ID");
+            event.forwardTo(HomeView.class);
+            return;
+        }
 
         VirtualRoom room = roomRepository.findById(roomId).orElse(null);
         if (room == null) {
@@ -188,7 +203,7 @@ public class LiveRoomView extends VerticalLayout implements BeforeEnterObserver 
 
     private void buildSidePanel(VirtualRoom room, ParticipantRole role, String participantName) {
         VerticalLayout info = new VerticalLayout();
-        info.addClassName("surface-card");
+        info.addClassName("card");
         info.addClassName("live-status-card");
         info.setPadding(false);
         info.setSpacing(false);

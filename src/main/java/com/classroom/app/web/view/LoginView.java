@@ -27,7 +27,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         addClassName("page-stack");
 
         VerticalLayout hero = new VerticalLayout();
-        hero.addClassName("hero-panel");
+        hero.addClassName("card");
         hero.setPadding(false);
         hero.setSpacing(false);
         hero.add(
@@ -41,7 +41,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         shell.addClassName("login-shell");
 
         VerticalLayout benefits = new VerticalLayout();
-        benefits.addClassName("section-band");
+        benefits.addClassName("card");
         benefits.setPadding(false);
         benefits.setSpacing(false);
         benefits.add(
@@ -52,7 +52,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         );
 
         VerticalLayout loginCard = new VerticalLayout();
-        loginCard.addClassName("surface-card");
+        loginCard.addClassName("card");
         loginCard.addClassName("login-card");
         loginCard.addClassName("form-rail");
         loginCard.setPadding(false);

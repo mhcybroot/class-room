@@ -54,7 +54,7 @@ public class StudentJoinView extends VerticalLayout implements BeforeEnterObserv
         content.addClassName("join-layout");
 
         VerticalLayout infoPanel = new VerticalLayout();
-        infoPanel.addClassName("surface-card");
+        infoPanel.addClassName("card");
         infoPanel.addClassName("info-panel");
         infoPanel.setPadding(false);
         infoPanel.setSpacing(false);
@@ -72,7 +72,7 @@ public class StudentJoinView extends VerticalLayout implements BeforeEnterObserv
         infoPanel.add(kicker, title, copy, chips);
 
         VerticalLayout joinCard = new VerticalLayout();
-        joinCard.addClassName("surface-card");
+        joinCard.addClassName("card");
         joinCard.addClassName("join-card");
         joinCard.setPadding(false);
         joinCard.setSpacing(false);
@@ -123,7 +123,7 @@ public class StudentJoinView extends VerticalLayout implements BeforeEnterObserv
         content.removeClassName("join-layout");
         if (room == null) {
             VerticalLayout invalidCard = new VerticalLayout();
-            invalidCard.addClassName("surface-card");
+            invalidCard.addClassName("card");
             invalidCard.addClassName("empty-state");
             invalidCard.setPadding(false);
             invalidCard.setSpacing(false);
